@@ -134,19 +134,7 @@ int main(void){
     
     
     //printf("1: %d 2: %d 3: %d 4: %d\n", memory_check(test),memory_check(test2),memory_check(test3),memory_check(test4));
-    
-    char *picus = memory_alloc(4);
-    char *picus2 = memory_alloc(4);
-    printf("adresaPicus: %p\n",picus);
-    memory_free(picus);
-    memory_free(picus2);
-    picus2 = memory_alloc(4);
-    picus = memory_alloc(4);
-    printf("memcheck: %d\n", memory_check(picus));
-    printf("adresaPicus: %p\n",picus);
-    //printf("adresaPicus2: %p\n",picus2);
-    
-    //printf("adresa2: %p\n",test2);
+   
     
     return 0;
 }
