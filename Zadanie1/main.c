@@ -167,7 +167,6 @@ void testBig(void) {
     memory_free(ptr);
     memory_free(p);
 
-printf("TEST BIG ukonceny\n");
 }
 
 
