@@ -40,8 +40,14 @@ void* memory_alloc(unsigned int size)
     }
     
     
-    if((tmp->size) > (size + headder)) //1. pripad: ak velkost volneho bloku je dostacujuca nasim potrebam
+    if((tmp->size) >= (size + headder)) //ak je mozne vlozit
     {
+        if((tmp->size) == size + headder)       //ak sa velkosti rovnaju staci zmenit len allocated
+        {
+            tmp->allocated = 1;
+            return (void*)tmp + headder;        //vraciame ukazovatel na pozadovane miesto zapisu dat
+        }
+        
         freeBlock = ((void*)tmp + size + headder);  //novy freeblock, ktoreho adresu nastavime za blok, ktory alokujeme
         freeBlock->size = (tmp->size) - size - headder;
         freeBlock->next = tmp->next;
@@ -54,14 +60,7 @@ void* memory_alloc(unsigned int size)
         return (void*)tmp + headder;
     }
     
-    else if((tmp->size) == size + headder)       //2. pripad: ak sa pozadovana velkost pamate presne rovna volnemu bloku
-    {
-        tmp->allocated = 1;
-        return (void*)tmp + headder;        //vraciame ukazovatel na pozadovane miesto zapisu dat
-        
-    }
-    
-    return NULL;                             //3. pripad: nedostatok volnej pamate
+    return NULL;                             //ak nieje mozne alokovat
 }
 
 int memory_check(void* ptr)
@@ -94,7 +93,7 @@ int memory_free(void* valid_ptr)
     
     tmp = begin;
     
-    while((tmp->next) != NULL)                //ak vzniknu dva volne bloky vedla seba tak ich spojime do jedneho
+    while((tmp->next) != NULL)              //ak vzniknu dva volne bloky vedla seba tak ich spojime do jedneho
     {
         if((tmp->allocated == 0) && ((tmp->next)->allocated == 0))
         {
@@ -138,52 +137,58 @@ void test_small()
 {
     char *test = memory_alloc(8);
     char *test2 = memory_alloc(8);
-    char *test3 = memory_alloc(4);
+    char *test3 = memory_alloc(8);
+    char *test4 = memory_alloc(8);
     
     memory_info_print();
     printf("|test: %p| ", test);
     printf("|test2: %p| ", test2);
-    printf("|test3: %p|\n", test3);
+    printf("|test3: %p|", test3);
+    printf("|test4: %p|\n", test4);
     
     
-    memory_free(test);
     memory_free(test2);
+    memory_info_print();
+    memory_free(test);
     memory_info_print();
 }
 
-void testBig(void) {
-    printf("TEST BIG spusteny\n");
+void test_Big(void) {
     
-    char* pointer = (char*)memory_alloc(4992);                        //alokovany blok o velkosti 4992 bytov
-    char* ptr = (char*)memory_alloc(1526);                            //alokovany blok o velkosti 1526 bytov
-    char* p = (char*)memory_alloc(2895);                            //alokovany blok o velkosti 2895 bytov
-
-    if (memory_check(pointer)) {
-        printf("Ukazovatel pointer je platny\n");
-        memset(pointer, 1, 4992);
-    }
-
-    memory_free(pointer);
-    memory_free(ptr);
-    memory_free(p);
+    char *test = memory_alloc(1000);
+    char *test2 = memory_alloc(1500);
+    char *test3 = memory_alloc(200);
+    char *test4 = memory_alloc(800);
+    
+    memory_info_print();
+    printf("|test: %p| ", test);
+    printf("|test2: %p| ", test2);
+    printf("|test3: %p|", test3);
+    printf("|test4: %p|\n", test4);
+    
+    
+    memory_free(test2);
+    memory_free(test);
+    memory_free(test3);
+    memory_info_print();
+    memory_free(test4);
+    memory_info_print();
 
 }
 
 
 int main(void){
     
-    int size = 5000;
+    int size = 64;
     char region[size];      //pole pamati, s danou velkostou v byte-och
     memory_init(region, size);
-    
-    
     
     for (int i = 0; i < size; i++)      //vypis adries regionu
         printf("%d: %p\n",i, &region[i]);
     
     //test_small();
-    testBig();
-    memory_info_print();
+    //test_Big();
+    //memory_info_print();
     
     return 0;
 }
